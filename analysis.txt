@@ -1,0 +1,91 @@
+Extract — 350 raw sales transactions (2023–2024)
+
+Clean — Null removal, case normalization, date format fixing, total recalculation, discount 
+capping
+
+Transform — Date parsing into Year/Month/Quarter, revenue banding, profit estimation, multi-key sorting
+
+Aggregate — Region KPIs, Category KPIs, Monthly trend with growth %
+
+STEPS TO DO:
+
+
+1. Identify data sources — Know where your data is coming from (CSV, database, API, Excel)
+
+2. Understand the business requirements — What's the end goal? What reports or outputs are needed?
+
+3. Extract the raw data — Pull data from the source without modifying anything
+
+4. Profile & explore the data — Check data types, row counts, nulls, duplicates, and value ranges
+5. Define data quality rules — Decide what counts as dirty data (e.g., nulls, wrong formats, outliers)
+
+6. Clean the data — Handle nulls, fix formats, correct wrong cases, remove duplicates, cap outliers
+
+7. Transform the data — Derive new columns, standardize values, apply business logic, parse dates
+
+8. Sort & filter — Arrange data as needed, remove irrelevant records
+
+9. Aggregate — Build summaries, KPIs, rollups by dimension (region, category, time)
+
+10. Validate the output — Cross-check record counts, totals, and spot-check transformed values
+
+11. Load to destination — Write to your target (Excel, database, data warehouse, dashboard)
+
+12. Log & document — Record what was done, how many records passed each step, and any issues found
+
+
+PROCESS TO FOLLOW:
+
+1. EXTRACT
+
+Open the RAW_DATA sheet — this is your starting point
+Note it has 350 rows of messy sales transactions
+
+
+2. PROFILE the raw data
+
+Check which rows are highlighted red → missing Quantity, Price, or Customer ID
+Check yellow rows → wrong cases, bad date formats, extreme discounts
+Look at the Date column — some are DD/MM/YYYY instead of YYYY-MM-DD
+
+
+3. CLEAN (see CLEANED_DATA sheet)
+
+Drop rows where Quantity or Unit_Price is null (lost 25 rows)
+Fill missing Customer_IDs with CUST-UNKNOWN-{TXN_ID}
+Fix Region, Category, Payment_Method to proper case (e.g., north → North)
+Standardize all dates to ISO format YYYY-MM-DD
+Recalculate Total_Amount where it was wrong using Qty × Price × (1 - Discount)
+Cap any Discount above 45% down to 30%
+
+
+4. TRANSFORM (see SORTED_TRANSFORMED sheet)
+
+Extract Year, Month, Quarter from the Date column
+Add Revenue_Band column — Platinum / Gold / Silver / Bronze
+Add Profit_Est column — estimated as 28% of Total_Amount
+Add Days_Since_Sale — how old each transaction is
+
+
+5. SORT
+
+Sort the data by Region → Category → Date (multi-key sort)
+
+
+6. AGGREGATE (see AGGREGATION_SUMMARY sheet)
+
+Summarize by Region → total revenue, avg order value, avg discount
+Summarize by Category → total units, completed %, cancelled %
+Build a Monthly Trend table with Month-over-Month growth %
+
+
+7. VALIDATE (see DATA_QUALITY_REPORT sheet)
+
+Confirm 350 raw → 325 cleaned (25 dropped = acceptable)
+Check quality score → 91.4%
+Verify no duplicate Transaction IDs exist
+
+
+8. LOG (see ETL_PIPELINE_LOG sheet)
+
+Every step is recorded with records in, records out, and status
